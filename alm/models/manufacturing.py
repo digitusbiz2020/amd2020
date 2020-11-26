@@ -33,7 +33,7 @@ class WorkOrders(models.Model):
         else:
             self.tasks_domain = False
 
-    project_id = fields.Integer(store=True)
+    project_id = fields.Integer(store=True,string="Project ")
     tasks_domain = fields.Boolean(compute='set_tasks_domain')
 
     def button_finish(self):
