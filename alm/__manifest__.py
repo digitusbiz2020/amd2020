@@ -2,7 +2,7 @@
     'name': 'ALM',
     'version': '12.0.0',
     "category": "Sales,stock,Accounting",
-    'summary': 'NPD',
+    'summary': 'ALM',
     "author": "Planet-odoo",
     'website': 'http://www.planet-odoo.com/',
     'depends': ['base','sale','mrp','project'],
