@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_project_form_inherit" model="ir.ui.view">
+        <field name="name">project.form.view.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form//field[@name='name']" position="after">
+                <field name="manufacturing_order" string="Manufacturing Order"/>
+                <field name="is_template" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="view_project_edit_form_inherit" model="ir.ui.view">
+        <field name="name">project.edit.form.view.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet//field[@name='name']" position="after">
+                <field name="manufacturing_order" placeholder="Manufacturing Order"/>
+            </xpath>
+            <xpath expr="/form//sheet//div[hasclass('oe_title')]" position="inside">
+                <group>
+                    <field name="is_template"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="view_project_kanban_inherit" model="ir.ui.view">
+        <field name="name">project.kanban.view.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="/kanban//field[@name='partner_id']" position="after">
+                <field name="is_template" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_task_form_inherit" model="ir.ui.view">
+        <field name="name">project.task.form.view.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet//field[@name='partner_id']" position="after">
+                <field name="wo_status" invisible="1"/>
+                <field name="wo_domain" invisible="1"/>
+                <field name="mo_id" invisible="1"/>
+                <field name="work_order" domain="[('production_id.id','=',mo_id)]"/>
+                <field name="start_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_task_kanban_inherit" model="ir.ui.view">
+        <field name="name">project.task.kanban.view.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="/kanban//div[hasclass('o_kanban_record_headings')]" position="replace">
+                <div class="o_kanban_record_headings">
+                    <strong class="o_kanban_record_title"><field name="name"/>  [<field name="inc_sequence"/>] </strong>
+                    <span  invisible="context.get('default_project_id', False) or context.get('fsm_mode', False)"><br/><field name="project_id" required="1"/></span>
+                    <br />
+                    <t t-if="record.partner_id.value">
+                        <span t-if="!record.partner_is_company.raw_value">
+                            <field name="commercial_partner_id"/>
+                        </span>
+                        <span t-else="">
+                            <field name="partner_id"/>
+                        </span>
+                    </t>
+                    <t t-else="record.email_from.raw_value"><span><field name="email_from"/></span></t>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="open_view_project_all_copy" model="ir.actions.act_window">
+        <field name="name">Projects</field>
+        <field name="res_model">project.project</field>
+        <field name="domain">[('is_template','=',True)]</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="project.view_project_kanban"/>
+        <field name="search_view_id" ref="project.view_project_project_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No projects found. Let's create one!
+            </p><p>
+            Projects regroup tasks on the same topic and each have their own dashboard.
+        </p>
+        </field>
+    </record>
+
+    <record id="project.open_view_project_all" model="ir.actions.act_window">
+        <field name="name">Projects</field>
+        <field name="res_model">project.project</field>
+        <field name="domain">[('is_template','=',False)]</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="view_id" ref="project.view_project_kanban"/>
+        <field name="search_view_id" ref="project.view_project_project_filter"/>
+        <field name="target">main</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No projects found. Let's create one!
+            </p><p>
+            Projects regroup tasks on the same topic and each have their own dashboard.
+        </p>
+        </field>
+    </record>
+
+    <record id="sequence_project_tasks" model="ir.sequence">
+        <field name="name">Project Tasks</field>
+        <field name="code">project.task</field>
+        <field name="active">TRUE</field>
+        <field name="prefix">T</field>
+        <field name="padding">4</field>
+        <!--        <field name="number_next">1</field>-->
+        <field name="number_increment">1</field>
+    </record>
+
+    <menuitem id="project_template"
+              name="Project Templates"
+              parent="project.menu_main_pm"
+              action="alm.open_view_project_all_copy"/>
+    <!--    <record id="project.action_view_task" model="ir.actions.act_window">-->
+    <!--        <field name="name">Tasks</field>-->
+    <!--        <field name="res_model">project.task</field>-->
+    <!--        <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity</field>-->
+    <!--        <field name="context">{'search_default_my_tasks': 1,'default_user_id':uid}</field>-->
+    <!--        <field name="domain">[('user_id','=',uid)]</field>-->
+    <!--        <field name="search_view_id" ref="project.view_task_search_form"/>-->
+    <!--        <field name="help" type="html">-->
+    <!--            <p class="o_view_nocontent_smiling_face">-->
+    <!--                No tasks found. Let's create one!-->
+    <!--            </p><p>-->
+    <!--            To get things done, use activities and status on tasks.<br/>-->
+    <!--            Chat in real time or by email to collaborate efficiently.-->
+    <!--        </p>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <!--    <record id="project.action_view_all_task" model="ir.actions.act_window">-->
+    <!--        <field name="name">Tasks</field>-->
+    <!--        <field name="res_model">project.task</field>-->
+    <!--        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>-->
+    <!--        <field name="context">{'search_default_my_tasks': 1, 'all_task': 0,'default_user_id':uid}</field>-->
+    <!--        <field name="domain">[('user_id','=',uid)]</field>-->
+    <!--        <field name="search_view_id" ref="project.view_task_search_form"/>-->
+    <!--        <field name="help" type="html">-->
+    <!--            <p class="o_view_nocontent_smiling_face">-->
+    <!--                No tasks found. Let's create one!-->
+    <!--            </p><p>-->
+    <!--            To get things done, use activities and status on tasks.<br/>-->
+    <!--            Chat in real time or by email to collaborate efficiently.-->
+    <!--        </p>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <!--    <record id="project.project_task_action_from_partner" model="ir.actions.act_window">-->
+    <!--        <field name="name">Tasks</field>-->
+    <!--        <field name="res_model">project.task</field>-->
+    <!--        <field name="view_mode">kanban,tree,form</field>-->
+    <!--        <field name="domain">[('user_id','=',uid)]</field>-->
+    <!--        <field name="search_view_id" ref="project.view_task_search_form"/>-->
+    <!--    </record>-->
+
+    <!--    <record id="project.action_view_task_overpassed_draft" model="ir.actions.act_window">-->
+    <!--        <field name="name">Overpassed Tasks</field>-->
+    <!--        <field name="res_model">project.task</field>-->
+    <!--        <field name="view_mode">tree,form,calendar,graph,kanban</field>-->
+    <!--        <field name="domain">[('is_closed', '=', False), ('date_deadline','&lt;',time.strftime('%Y-%m-%d')),('user_id','=',uid)]</field>-->
+    <!--        <field name="filter" eval="True"/>-->
+    <!--        <field name="search_view_id" ref="project.view_task_search_form"/>-->
+    <!--    </record>-->
+
+    <!--    <record id="project.dblc_proj" model="ir.actions.act_window">-->
+    <!--        <field name="res_model">project.task</field>-->
+    <!--        <field name="name">Project's tasks</field>-->
+    <!--        <field name="view_mode">tree,form,calendar,graph,kanban</field>-->
+    <!--        <field name="domain">[('project_id', '=', active_id),('user_id','=',uid)]</field>-->
+    <!--        <field name="context">{'project_id':active_id}</field>-->
+    <!--    </record>-->
+
+    <!--    <record id="project.act_res_users_2_project_task_opened" model="ir.actions.act_window">-->
+    <!--        <field name="name">Assigned Tasks</field>-->
+    <!--        <field name="res_model">project.task</field>-->
+    <!--        <field name="view_mode">tree,form,calendar,graph</field>-->
+    <!--        <field name="domain">[('project_id', '=', active_id),('user_id','=',uid)]</field>-->
+    <!--        <field name="context">{'search_default_user_id': [uid], 'default_user_id': uid}</field>-->
+    <!--        <field name="binding_model_id" ref="base.model_res_users"/>-->
+    <!--        <field name="binding_view_types">form</field>-->
+    <!--    </record>-->
+
+    <!--    &lt;!&ndash;    <record model="ir.rule" id="project_project_user_rule">&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field name="name">Project: User is Member</field>&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field name="model_id" ref="model_project_task"/>&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field name="groups" eval="[(4,ref('project.group_project_user'))]"/>&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field name="domain_force">[('user_id', '=', user.id)]</field>&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field eval="1" name="perm_read"/>&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field eval="1" name="perm_write"/>&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field eval="1" name="perm_unlink"/>&ndash;&gt;-->
+    <!--    &lt;!&ndash;             <field eval="1" name="perm_create"/>&ndash;&gt;-->
+    <!--    &lt;!&ndash;     </record>&ndash;&gt;-->
+</odoo>
