@@ -5,7 +5,7 @@
     'summary': 'ALM',
     "author": "Planet-odoo",
     'website': 'http://www.planet-odoo.com/',
-    'depends': ['base','sale','mrp','project'],
+    'depends': ['base','sale','mrp','project','purchase_stock'],
     'data': [
             'security/ir.model.access.csv',
             'views/sale_order_view.xml',
