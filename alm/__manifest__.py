@@ -1,6 +1,6 @@
 {
     'name': 'ALM',
-    'version': '12.0.0',
+    'version': '14.0.0',
     "category": "Sales,stock,Accounting",
     'summary': 'ALM',
     "author": "Planet-odoo",
